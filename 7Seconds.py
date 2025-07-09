@@ -10,8 +10,10 @@ import LEDlib
 # 7 second timer
 # score
 # countdown to start
-# 100 spark when hitting popsicle
 # animation list
+# 2x flags
+# 2x+1 flags
+# pinball like? bouncers, speed increasers, ?
 
 
 HitWall = False
@@ -51,7 +53,7 @@ class LEDobj:
             self.canvas.delete(p)
     def draw(self):
         self.undraw()
-        self.LEDPoints = []
+        self.LEDPoints = []  
         LEDlib.psize = self.pixelsize
         LEDlib.createCharColourSolid(self.canvas,self.x,self.y,self.CharPoints,self.LEDPoints)
         if self.collisionrectshow:
@@ -60,6 +62,10 @@ class LEDobj:
     def move(self): 
          self.x = self.x + self.dx
          self.y = self.y + self.dy
+         if self.x > MAXx-48: self.x = MAXx-48
+         if self.y > MAXy-48: self.y = MAXy-48
+         if self.x < 0 : self.x = 0
+         if self.y < 0 : self.y = 0
          self.draw()
     def rotate(self,angledeg):
          centerx = sum(x for x,y,z in self.OriginalCharPoints)/len(self.OriginalCharPoints)
@@ -71,6 +77,33 @@ class LEDobj:
          x1,y1,x2,y2 = self.collisionrect 
          self.collisionimage = canvas1.create_rectangle(self.x+x1,self.y+y1,self.x+x2,self.y+y2,fill="", outline = "white") 
          
+class LEDscoreobj:
+    def __init__(self, canvas,x=0,y=0, score = 0, colour = "white", pixelsize = 2, charwidth=23, numzeros = 0):
+         self.x = x
+         self.y = y
+         self.score = score
+         self.canvas = canvas
+         self.LEDPoints = []
+         self.colour = colour
+         self.pixelsize = pixelsize
+         self.charwidth = charwidth
+         self.numzeros = numzeros 
+         self.draw()
+    def draw(self):
+        LEDlib.charwidth = self.charwidth
+        LEDlib.psize = self.pixelsize
+        LEDlib.ShowColourScore(self.canvas,self.x,self.y,self.colour,self.score,self.LEDPoints, self.numzeros) 
+    def undraw(self):
+         for p in self.LEDPoints:
+            self.canvas.delete(p)
+    def update(self,myscore):
+        self.score = myscore
+        self.undraw()
+        self.draw()
+
+
+
+
 
 def checkcollisionrect(object1,object2):
      x1,y1,x2,y2 = object1.collisionrect 
@@ -99,14 +132,18 @@ STEPD = 3  # change dx,dy with this
 
 mainwin = Tk()
 
-mainwin.geometry("640x346") 
-canvas1 = Canvas(mainwin,width=640,height= 346,bg="black")
+MAXx = 700
+MAXy = 400
+
+score = 0
+
+mainwin.geometry(str(MAXx)+"x"+str(MAXy)) 
+canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
 canvas1.place(x=0,y=0)
 
-myship = LEDobj(canvas1,300,100,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
+myship = LEDobj(canvas1,300,30,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
 myship.collisionrect = (2,0,46,48)
 #myship.showcollisionrect()
-
 
 fruitlist = []
 solidlist = []
@@ -114,7 +151,7 @@ solidlist = []
 
 for i in range(20):
      x = random.randint(0,600)
-     y = random.randint(0,300)
+     y = 100+random.randint(0,200)
      if random.randint(0,2) > 0:
        fruit = LEDobj(canvas1,x,y,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
        fruit.collisionrect = (0,0,16,36)
@@ -126,13 +163,18 @@ for i in range(20):
        #robotron.showcollisionrect()
        solidlist.append(robotron)
 
+displayscore = LEDscoreobj(canvas1,x=MAXx-200,y=20,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=8)
+
 def gameloop():
-    global HitWall
+    global HitWall, score
     myship.move()
     for fruit in fruitlist:
        if checkcollisionrect(myship,fruit): 
+            LEDscoreobj(canvas1,x=fruit.x-14,y=fruit.y+10,score=100,colour="white",pixelsize=2, charwidth = 12)
             fruit.undraw()
             fruitlist.remove(fruit)
+            score = score + 100
+            displayscore.update(score)
     for solid in solidlist:
          if checkcollisionrect(myship,solid): 
             myship.dx = -myship.dx
