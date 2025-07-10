@@ -8,12 +8,12 @@ import LEDlib
 
 # TODO
 # 7 second timer
-# score
 # countdown to start
 # animation list
 # 2x flags
 # 2x+1 flags
 # pinball like? bouncers, speed increasers, ?
+# moving walls/obsticles? -> moving away from original idea. Not a platformer
 
 
 HitWall = False
@@ -128,7 +128,7 @@ charRobotron = [(1,4,"#FF0000"), (1,5,"#FFFF00"), (1,6,"#FFFF00"), (1,7,"#FFFF00
 
 
 
-STEPD = 3  # change dx,dy with this
+STEPD = 4 # speed of car. This changes dx,dy.
 
 mainwin = Tk()
 
@@ -137,13 +137,15 @@ MAXy = 400
 
 score = 0
 
+ShowAllCollisions = False
+
 mainwin.geometry(str(MAXx)+"x"+str(MAXy)) 
 canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
 canvas1.place(x=0,y=0)
 
 myship = LEDobj(canvas1,300,30,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
-myship.collisionrect = (2,0,46,48)
-#myship.showcollisionrect()
+myship.collisionrect = (4,3,44,45)
+if ShowAllCollisions: myship.showcollisionrect()
 
 fruitlist = []
 solidlist = []
@@ -155,12 +157,12 @@ for i in range(20):
      if random.randint(0,2) > 0:
        fruit = LEDobj(canvas1,x,y,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
        fruit.collisionrect = (0,0,16,36)
-       #fruit.showcollisionrect()
+       if ShowAllCollisions: fruit.showcollisionrect()
        fruitlist.append(fruit)
      else:
        robotron = LEDobj(canvas1,x,y,dx = 0,dy = 0,CharPoints=charRobotron, pixelsize = 2,typestring = "solid")
-       robotron.collisionrect = (0,0,20,24)
-       #robotron.showcollisionrect()
+       robotron.collisionrect = (4,1,17,24)
+       if ShowAllCollisions: robotron.showcollisionrect()
        solidlist.append(robotron)
 
 displayscore = LEDscoreobj(canvas1,x=MAXx-200,y=20,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=8)
@@ -177,8 +179,13 @@ def gameloop():
             displayscore.update(score)
     for solid in solidlist:
          if checkcollisionrect(myship,solid): 
-            myship.dx = -myship.dx
-            myship.dy = -myship.dy
+            #myship.dx = -myship.dx
+            #myship.dy = -myship.dy
+            if not HitWall:
+              myship.x = myship.x - myship.dx
+              myship.y = myship.y - myship.dy
+            myship.dx = 0
+            myship.dy = 0
             HitWall = True
             break # exit the for loop
     mainwin.after(10,gameloop)
