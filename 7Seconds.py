@@ -71,14 +71,13 @@ class LEDobj:
     def resetposition(self,x,y):
         self.x, self.y = x,y
         self.dx, self.dy = 0,0
-        self.undraw()
         self.draw()
     def undraw(self):
          for p in self.LEDPoints:
             self.canvas.delete(p)
+         self.LEDPoints.clear()
     def draw(self):
         self.undraw()
-        self.LEDPoints = []  
         LEDlib.psize = self.pixelsize
         LEDlib.createCharColourSolid(self.canvas,self.x,self.y,self.CharPoints,self.LEDPoints)
         if self.collisionrectshow:
@@ -115,15 +114,16 @@ class LEDscoreobj:
          self.numzeros = numzeros 
          self.draw()
     def draw(self):
+        self.undraw()
         LEDlib.charwidth = self.charwidth
         LEDlib.psize = self.pixelsize
         LEDlib.ShowColourScore(self.canvas,self.x,self.y,self.colour,self.score,self.LEDPoints, self.numzeros) 
     def undraw(self):
          for p in self.LEDPoints:
             self.canvas.delete(p)
+         self.LEDPoints.clear()
     def update(self,myscore):
         self.score = myscore
-        self.undraw()
         self.draw()
 
 
@@ -151,7 +151,7 @@ mainwin.geometry(str(MAXx)+"x"+str(MAXy))
 canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
 canvas1.place(x=0,y=0)
 
-myship = LEDobj(canvas1,300,30,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
+myship = LEDobj(canvas1,MAXx//2,MAXy//2,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
 myship.collisionrect = (4,3,44,45)
 if ShowAllCollisions: myship.showcollisionrect()
 
@@ -159,8 +159,25 @@ fruitlist = []
 solidlist = []
 scoreddisplay = []
 
-wallsize = 30
-walls = [(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)]
+wallsize = 30  # put blocks in grid from (0,0) to (22,12)
+def block(x,y,n): # make an nxn block at (x,y)
+    myset = set()  # cannot use {} for emptyset, o/w it is a dictionary
+    for i in range(n):
+        for j in range(n):
+            myset.add((x+i,y+j))
+    return myset          
+            
+walls = {(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)} | block(10,10,3) | block(4,8,2)
+walls = walls | block(18,4,2) | block(10,4,2)
+# {...} is a set. Take union with {..} | {..}
+
+
+popiscletype  = 1
+ # put blocks in grid from (0,0) to (22,12)
+pointsset = {(4,4,popiscletype),(4,2,popiscletype), (8,2,popiscletype),
+             (10,2,popiscletype),(12,2,popiscletype),(14,2,popiscletype),
+             (16,2,popiscletype), (18,2,popiscletype),
+             (0,12,popiscletype), (22,12,popiscletype) }
 
 displayscore = LEDscoreobj(canvas1,x=MAXx-200,y=20,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=8)
 
@@ -177,17 +194,11 @@ def makewalls():
 
 def createplayfield():
    makewalls()
-   robotron = LEDobj(canvas1,MAXx-48,MAXy-48,dx = 0,dy = 0,CharPoints=charRobotron, pixelsize = 2,typestring = "solid")
-   robotron.collisionrect = (4,1,17,24)
-   solidlist.append(robotron)
-   for i in range(20):
-     x = random.randint(0,600)
-     y = 100+random.randint(0,200)
-     if random.randint(0,2) > 0:
-       fruit = LEDobj(canvas1,x,y,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
-       fruit.collisionrect = (0,0,16,36)
-       if ShowAllCollisions: fruit.showcollisionrect()
-       fruitlist.append(fruit)
+   for x,y,stype in pointsset:
+       if stype == popiscletype:
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
+           fruit.collisionrect = (0,0,16,36)
+           fruitlist.append(fruit)
        
 
 def eraseplayfield():
@@ -216,12 +227,14 @@ def gameloop():
     global HitWall, score 
     if PlayerAlive: myship.move()
     for fruit in fruitlist:
-       if checkcollisionrect(myship,fruit): 
-            scoreddisplay.append(LEDscoreobj(canvas1,x=fruit.x-14,y=fruit.y+10,score=100,colour="white",pixelsize=2, charwidth = 12))
+       if checkcollisionrect(myship,fruit):
+            points100 = LEDscoreobj(canvas1,x=fruit.x-14,y=fruit.y+10,score=100,colour="white",pixelsize=2, charwidth = 12)
+            scoreddisplay.append(points100)
             fruit.undraw()
             fruitlist.remove(fruit)
             score = score + 100
             displayscore.update(score)
+            print(len(fruitlist))
     for solid in solidlist:
          if checkcollisionrect(myship,solid): 
             if not HitWall:
@@ -243,7 +256,7 @@ def mykey(event):
         starttime = time.time()
         eraseplayfield()
         createplayfield()
-        myship.resetposition(x=300,y=30)
+        myship.resetposition(MAXx//2,MAXy//2)
         score = 0
         displayclock.colour = "lightgreen"
         displayclock.update(7)
