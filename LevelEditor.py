@@ -25,7 +25,7 @@ charWall2 = [(0,2,"#FFFFFF"), (0,3,"#FFFFFF"), (0,4,"#FFFFFF"), (0,5,"#FFFFFF"),
 
 wallsize = 30  # put blocks in grid from (0,0) to (22,12)
 
-wallsset = {(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)} 
+wallsset = set() 
 
 # {...} is a set. Take union with {..} | {..}
 
@@ -35,11 +35,7 @@ strawberrytype = 2
 chipstype = 3
 icecreamtype = 4
  # put blocks in grid from (0,0) to (22,12)
-pointsset = {(4,4,popiscletype),(4,2,popiscletype), (8,2,popiscletype),
-             (10,2,popiscletype),(12,2,popiscletype),(14,2,popiscletype),
-             (16,2,popiscletype), (18,2,popiscletype), (16,4,popiscletype), (16,6,popiscletype),
-             (0,12,popiscletype), (22,12,strawberrytype), (0,6,chipstype),(18,7,icecreamtype),
-             (14,4,icecreamtype)}
+pointsset = set()
 
 
 STEPD = 4 # speed of car. This changes dx,dy.
@@ -56,6 +52,7 @@ class LEDobj:
          self.dy = dy
          self.canvas = canvas
          self.typestring = typestring
+         self.typenumber = 0
          self.LEDPoints = []
          self.OriginalCharPoints = CharPoints
          self.CharPoints = CharPoints.copy()
@@ -135,25 +132,49 @@ def createplayfield():
            #fruit.showcollisionrect()
            fruitlist.append(fruit)
        
+
+def findobj(x,y):
+    for f in fruitlist:
+        if f.x == x*wallsize and f.y == y*wallsize:
+            return f
+    for w in solidlist:
+        if w.x == x*wallsize and w.y == y*wallsize:
+            return w
+    return 0
+
 def showclick(event):
     x,y = event.x//wallsize, event.y//wallsize
     mychar = charWall2
+    typenumber = 0
     if selected_type.get() == "Wall":
         mychar = charWall2
         wallcords.append((x,y))
     if selected_type.get() == "Chips":
         mychar = charChips
+        typenumber = chipstype
     if selected_type.get() == "Icecream":
         mychar = charIceCream
+        typenumber = icecreamtype
     if selected_type.get() == "Popiscle":
-        mychar = charPopsicle  
-    wallstring  = ""
-    for x,y in wallcords:
-        wallstring = wallstring + "("+str(x)+","+str(y)+"),"
-
-    print("walls = {"+wallstring+"}")  
-    fruit = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "fruit")
-    
+        mychar = charPopsicle 
+        typenumber = popiscletype
+    if selected_type.get() == "Erase Mode":
+        myobj = findobj(x,y) 
+        if myobj != 0:
+            if myobj.typestring == "wall":
+                solidlist.remove(myobj)
+            else:
+                fruitlist.remove(myobj)
+            myobj.undraw()
+        return
+    if selected_type.get() == "Wall":
+      wall = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "wall")
+      solidlist.append(wall)
+    else:
+      fruit = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "fruit")
+      fruit.typenumber = typenumber
+      fruitlist.append(fruit) 
+   
 selected_type = StringVar(value="Wall")
 
 def set_object_type(obj_type):
@@ -163,7 +184,7 @@ def set_object_type(obj_type):
 button_frame = Frame(mainwin)
 button_frame.pack(side="bottom",pady=5)
 
-for obj in ["Wall", "Chips", "Icecream", "Popiscle"]:
+for obj in ["Wall", "Chips", "Icecream", "Popiscle","Erase Mode"]:
     btn = Button(button_frame, text=obj, width=10,
                     command=lambda o=obj: set_object_type(o))
     btn.pack(side="left", padx=5)
@@ -176,6 +197,45 @@ for x in range(0, MAXx, wallsize):
 
 for y in range(0, MAXy, wallsize):
     canvas1.create_line(0, y, MAXx, y, fill="white")
+
+def CopyWallData():
+    print("Copy wall data to clipboard")
+    wallstring  = "walls = {"
+    for i,w in enumerate(solidlist):
+        wallstring = wallstring + "("+str(w.x//wallsize)+","+str(w.y//wallsize)+")"
+        if i != len(solidlist)-1:
+            wallstring += ","
+    wallstring += "}"
+    textOutput.delete('1.0','end')
+    textOutput.insert(INSERT,wallstring)
+    textOutput.tag_add('sel','1.0','end')
+    selected_text = textOutput.get(SEL_FIRST, SEL_LAST)
+    mainwin.clipboard_clear()
+    mainwin.clipboard_append(selected_text)
+
+btnCopyWallData = Button(mainwin,text="Copy wall data", command = CopyWallData)
+btnCopyWallData.place(x=100,y=500)
+
+def CopyFruitData():
+    print("Copy fruit data to clipboard")
+    fruitstring  = "pointsset = {"
+    for i,f in enumerate(fruitlist):
+        fruitstring += "("+str(f.x//wallsize)+","+str(f.y//wallsize)+","+str(f.typenumber)+")"
+        if i != len(fruitlist)-1:
+            fruitstring += ","
+    fruitstring += "}"
+    textOutput.delete('1.0','end')
+    textOutput.insert(INSERT,fruitstring)
+    textOutput.tag_add('sel','1.0','end')
+    selected_text = textOutput.get(SEL_FIRST, SEL_LAST)
+    mainwin.clipboard_clear()
+    mainwin.clipboard_append(selected_text)
+
+btnCopyFruitData = Button(mainwin,text="Copy fruit data", command = CopyFruitData)
+btnCopyFruitData.place(x=300,y=500)
+
+textOutput = Text(mainwin,width=100,height=2,bg="black",fg="orange")
+textOutput.place(x=10,y=420)
 
 canvas1.bind("<Button-1>", showclick)
 
