@@ -2,7 +2,7 @@ import math
 import sys
 import random
 import time
-from tkinter import *
+from tkinter import * 
 
 sys.path.insert(0, "/home/deck/Documents")
 import LEDlib
@@ -42,6 +42,9 @@ walls = {(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)} | block(10,10,3)
 walls = walls | block(18,4,2) | block(10,4,2)
 # {...} is a set. Take union with {..} | {..}
 
+#walls = {(1,12),(1,10),(1,9),(3,9),(5,9),(6,9),(6,11),(12,9),(12,10),(12,12),(13,9),(15,9),(16,9),(17,9),(18,11),(17,12),(14,6),(12,5),(10,5),(9,6),(4,8),(2,7),(1,4),(4,2),(10,1),(17,1),(21,2),(21,3),(21,5),(21,6),(21,7)}
+
+
 
 popiscletype  = 1
 strawberrytype = 2
@@ -53,6 +56,9 @@ pointsset = {(4,4,popiscletype),(4,2,popiscletype), (8,2,popiscletype),
              (16,2,popiscletype), (18,2,popiscletype), (16,4,popiscletype), (16,6,popiscletype),
              (0,12,popiscletype), (22,12,strawberrytype), (0,6,chipstype),(18,7,icecreamtype),
              (14,4,icecreamtype)}
+
+#pointsset = {(3,10,3),(3,7,3),(3,5,3),(10,10,4),(11,7,4),(11,5,4),(14,10,1),(15,7,1),(15,5,1)}
+
 
 
 STEPD = 4 # speed of car. This changes dx,dy.
