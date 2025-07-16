@@ -2,6 +2,7 @@ import math
 import sys
 import random
 import time
+import re
 from tkinter import * 
 
 sys.path.insert(0, "/home/deck/Documents")
@@ -25,11 +26,8 @@ charWall2 = [(0,2,"#FFFFFF"), (0,3,"#FFFFFF"), (0,4,"#FFFFFF"), (0,5,"#FFFFFF"),
 
 wallsize = 30  # put blocks in grid from (0,0) to (22,12)
 
-wallsset = set() 
 
-# {...} is a set. Take union with {..} | {..}
-
-
+# do not change these o/w leveleditor will not work correctly
 popiscletype  = 1
 strawberrytype = 2
 chipstype = 3
@@ -93,44 +91,8 @@ canvas1.place(x=0,y=0)
 fruitlist = []
 solidlist = []
 
-wallcords = []
-fruitcords = []
-         
 
 
-
-def makewalls():
-    for x,y in wallsset:
-        wall = LEDobj(canvas1,x*wallsize-8,y*wallsize-8,dx = 0,dy = 0,CharPoints=charWall2, pixelsize = 2,typestring = "solid")
-        wall.collisionrect = (8,8,40,40)
-        solidlist.append(wall) 
-
-def createplayfield():
-   makewalls()
-   for x,y,stype in pointsset:
-       if stype == popiscletype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
-           fruit.collisionrect = (0,0,16,36)
-           fruit.PointsType = 100
-           fruitlist.append(fruit)
-       if stype == strawberrytype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charPacmanStrawberry, pixelsize = 2,typestring = "fruit")
-           fruit.collisionrect = (0,6,22,30)
-           fruit.PointsType = 200
-           #fruit.showcollisionrect()
-           fruitlist.append(fruit)
-       if stype == chipstype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charChips, pixelsize = 2,typestring = "fruit")
-           fruit.collisionrect = (0,0,22,32)
-           fruit.PointsType = 300
-           #fruit.showcollisionrect()
-           fruitlist.append(fruit)
-       if stype == icecreamtype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charIceCream, pixelsize = 2,typestring = "fruit")
-           fruit.collisionrect = (0,0,17,32)
-           fruit.PointsType = 400
-           #fruit.showcollisionrect()
-           fruitlist.append(fruit)
        
 
 def findobj(x,y):
@@ -148,7 +110,6 @@ def showclick(event):
     typenumber = 0
     if selected_type.get() == "Wall":
         mychar = charWall2
-        wallcords.append((x,y))
     if selected_type.get() == "Chips":
         mychar = charChips
         typenumber = chipstype
@@ -190,8 +151,6 @@ for obj in ["Wall", "Chips", "Icecream", "Popiscle","Erase Mode"]:
     btn.pack(side="left", padx=5)
 
 
-createplayfield()
-
 for x in range(0, MAXx, wallsize):
     canvas1.create_line(x, 0, x, MAXy, fill="white")
 
@@ -199,7 +158,7 @@ for y in range(0, MAXy, wallsize):
     canvas1.create_line(0, y, MAXx, y, fill="white")
 
 def CopyWallData():
-    print("Copy wall data to clipboard")
+    print("Copied wall data to clipboard")
     wallstring  = "walls = {"
     for i,w in enumerate(solidlist):
         wallstring = wallstring + "("+str(w.x//wallsize)+","+str(w.y//wallsize)+")"
@@ -214,10 +173,10 @@ def CopyWallData():
     mainwin.clipboard_append(selected_text)
 
 btnCopyWallData = Button(mainwin,text="Copy wall data", command = CopyWallData)
-btnCopyWallData.place(x=100,y=500)
+btnCopyWallData.place(x=20,y=500)
 
 def CopyFruitData():
-    print("Copy fruit data to clipboard")
+    print("Copied fruit data to clipboard")
     fruitstring  = "pointsset = {"
     for i,f in enumerate(fruitlist):
         fruitstring += "("+str(f.x//wallsize)+","+str(f.y//wallsize)+","+str(f.typenumber)+")"
@@ -232,10 +191,59 @@ def CopyFruitData():
     mainwin.clipboard_append(selected_text)
 
 btnCopyFruitData = Button(mainwin,text="Copy fruit data", command = CopyFruitData)
-btnCopyFruitData.place(x=300,y=500)
+btnCopyFruitData.place(x=180,y=500)
 
-textOutput = Text(mainwin,width=100,height=2,bg="black",fg="orange")
-textOutput.place(x=10,y=420)
+textOutput = Text(mainwin,width=50,height=6,bg="black",fg="orange")
+textOutput.place(x=10,y=410)
+
+textInput = Text(mainwin,width=50,height=6,bg="black",fg="orange")
+textInput.place(x=350,y=410)
+textInput.insert(INSERT,"Paste Text Data Here")
+
+
+def ReadFruitData():
+    print("reading fruit from text data")
+    count = 0
+    coordinate_string = textInput.get("1.0", END)
+    # Regular expression to extract pairs of numbers
+    matches = re.findall(r'\((\d+),(\d+),(\d+)\)', coordinate_string)
+    # Convert matches to a list of tuples
+    coordinates = [(int(x),int(y),int(z)) for x,y,z in matches]
+    for x,y,z in coordinates:
+          typenumber = z
+          if typenumber == popiscletype:
+              mychar = charPopsicle
+          if typenumber == strawberrytype:
+              mychar = charPacmanStrawberry
+          if typenumber == chipstype:
+              mychar = charChips
+          if typenumber == icecreamtype:
+              mychar = charIceCream
+          fruit = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "wall")
+          fruitlist.append(fruit)
+          count = count + 1
+          print("reading ...", count)
+
+def ReadWallData():
+    print("reading walls from text data")
+    count = 0
+    coordinate_string = textInput.get("1.0", END)
+    # Regular expression to extract pairs of numbers
+    matches = re.findall(r'\((\d+),(\d+)\)', coordinate_string)
+    # Convert matches to a list of tuples
+    coordinates = [(int(x),int(y)) for x,y in matches]
+    for x,y in coordinates:
+          mychar = charWall2
+          wall = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "wall")
+          solidlist.append(wall)
+          count = count + 1
+          print("reading ...", count)
+
+btnReadFruitData = Button(mainwin,text="Read fruit data", command = ReadFruitData)
+btnReadFruitData.place(x=520,y=500)
+
+btnReadWallData = Button(mainwin,text="Read wall data", command = ReadWallData)
+btnReadWallData.place(x=360,y=500)
 
 canvas1.bind("<Button-1>", showclick)
 
