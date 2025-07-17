@@ -8,7 +8,7 @@ sys.path.insert(0, "/home/deck/Documents")
 import LEDlib
 
 # TODO
-# level editor
+# multichoice style with rows
 # animation list
 # 2x flags
 # 2x+1 flags
@@ -38,33 +38,45 @@ def block(x,y,n): # make an nxn block at (x,y)
             myset.add((x+i,y+j))
     return myset 
 
-walls = {(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)} | block(10,10,3) | block(4,8,2)
-walls = walls | block(18,4,2) | block(10,4,2)
-# {...} is a set. Take union with {..} | {..}
+STEPD = 4 # speed of car. This changes dx,dy.
 
-#walls = {(1,12),(1,10),(1,9),(3,9),(5,9),(6,9),(6,11),(12,9),(12,10),(12,12),(13,9),(15,9),(16,9),(17,9),(18,11),(17,12),(14,6),(12,5),(10,5),(9,6),(4,8),(2,7),(1,4),(4,2),(10,1),(17,1),(21,2),(21,3),(21,5),(21,6),(21,7)}
+MAXx = 700
+MAXy = 400
 
+STARTX = 0  # start location of car
+STARTY = MAXy//2-10
 
+LEVELSTART = 2   # change with start keys 1,2,3,...,9
 
+# do not change these o/w leveleditor will not work correctly
 popiscletype  = 1
 strawberrytype = 2
 chipstype = 3
 icecreamtype = 4
  # put blocks in grid from (0,0) to (22,12)
-pointsset = {(4,4,popiscletype),(4,2,popiscletype), (8,2,popiscletype),
+
+
+
+walls1 = {(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)} | block(10,10,3) | block(4,8,2)
+walls1 = walls1 | block(18,4,2) | block(10,4,2)
+# {...} is a set. Take union with {..} | {..}
+pointsset1 = {(4,4,popiscletype),(4,2,popiscletype), (8,2,popiscletype),
              (10,2,popiscletype),(12,2,popiscletype),(14,2,popiscletype),
              (16,2,popiscletype), (18,2,popiscletype), (16,4,popiscletype), (16,6,popiscletype),
              (0,12,popiscletype), (22,12,strawberrytype), (0,6,chipstype),(18,7,icecreamtype),
              (14,4,icecreamtype)}
 
-#pointsset = {(3,10,3),(3,7,3),(3,5,3),(10,10,4),(11,7,4),(11,5,4),(14,10,1),(15,7,1),(15,5,1)}
+
+walls2 = {(2,2),(7,8),(9,8),(7,8),(8,8),(6,8),(10,8),(10,8),(11,8),(11,8),(13,8),(12,8),(14,8),(15,8),(16,8),(17,8),(18,8),(18,8),(19,8),(22,11),(22,10),(22,9),(22,8),(21,8),(20,8),(22,5),(22,7),(22,6),(22,4),(22,3),(22,2),(1,2),(0,2),(2,1),(2,0),(22,12),(21,12),(20,12),(18,12),(19,12),(17,12),(16,12),(15,12),(13,12),(14,12),(12,12),(11,12),(10,12),(10,12),(9,12),(8,12),(7,12),(6,12),(22,1),(22,0),(21,4),(20,4),(19,4),(17,4),(16,4),(18,4),(15,4),(14,4),(12,4),(13,4),(11,4),(9,4),(10,4),(8,4),(6,4),(7,4)}
+pointsset2 = {(5,10,1),(7,10,1),(9,10,1),(10,10,1),(12,10,1),(14,10,1),(15,10,1),(17,10,1),(18,10,1),(21,10,4),(21,6,4),(21,2,3),(5,6,1),(9,6,1),(13,6,1),(10,2,1),(14,1,1),(16,2,1),(18,1,1),(17,6,4),(19,6,4),(15,6,4),(20,3,4),(20,2,4),(20,1,4),(19,2,4),(17,2,4),(18,2,4)}
+
+wallslist = [walls1,walls2]
+pointslist = [pointsset1, pointsset2]
+
+walls = wallslist[LEVELSTART-1]
+pointsset = pointslist[LEVELSTART-1]
 
 
-
-STEPD = 4 # speed of car. This changes dx,dy.
-
-MAXx = 700
-MAXy = 400
 
 score = 0
 
@@ -187,7 +199,7 @@ mainwin.geometry(str(MAXx)+"x"+str(MAXy))
 canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
 canvas1.place(x=0,y=0)
 
-myship = LEDobj(canvas1,MAXx//2,MAXy//2,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
+myship = LEDobj(canvas1,STARTX,STARTY,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
 myship.collisionrect = (4,3,44,45)
 if ShowAllCollisions: myship.showcollisionrect()
 
@@ -284,14 +296,17 @@ def gameloop():
 gameloop()
 
 def mykey(event):
-    global HitWall, PlayerAlive, starttime,score
+    global HitWall, PlayerAlive, starttime,score,walls,pointsset, LEVELSTART
     key = event.keysym
-    if key == "1":
+    if key in ["1","2","3","4"]:
+        LEVELSTART = int(key)
         PlayerAlive = True
         starttime = time.time()
         eraseplayfield()
+        walls = wallslist[LEVELSTART-1]
+        pointsset = pointslist[LEVELSTART-1]
         createplayfield()
-        myship.resetposition(MAXx//2,MAXy//2)
+        myship.resetposition(STARTX,STARTY)
         score = 0
         displayclock.colour = "lightgreen"
         displayclock.update(7)
