@@ -1,15 +1,19 @@
 import math
 import sys
-import random
+import os
 import time
 from tkinter import * 
 
-sys.path.insert(0, "/home/deck/Documents")
+sys.path.insert(0, "/home/deck/Documents") # needed to load LEDlib
 import LEDlib
 
+# for loading files (.png, .txt), set current directory = location of this python script (needed for Linux)
+current_script_directory = os.path.dirname(os.path.abspath(__file__))
+os.chdir(current_script_directory)
+
 # TODO
-# multichoice style with rows
-# animation list
+# after pressing 1-9, display 3 ... 2 ... 1 ... GO!
+# math symbols and identities for levels
 # 2x flags
 # 2x+1 flags
 
@@ -55,23 +59,28 @@ chipstype = 3
 icecreamtype = 4
  # put blocks in grid from (0,0) to (22,12)
 
+mainwin = Tk()
+mainwin.geometry(str(MAXx)+"x"+str(MAXy)) 
+canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
+canvas1.place(x=0,y=0)
 
-
-walls1 = {(0,2),(1,2),(2,2),(2,1),(2,0),(5,0),(5,1),(5,2),(5,3)} | block(10,10,3) | block(4,8,2)
-walls1 = walls1 | block(18,4,2) | block(10,4,2)
 # {...} is a set. Take union with {..} | {..}
-pointsset1 = {(4,4,popiscletype),(4,2,popiscletype), (8,2,popiscletype),
-             (10,2,popiscletype),(12,2,popiscletype),(14,2,popiscletype),
-             (16,2,popiscletype), (18,2,popiscletype), (16,4,popiscletype), (16,6,popiscletype),
-             (0,12,popiscletype), (22,12,strawberrytype), (0,6,chipstype),(18,7,icecreamtype),
-             (14,4,icecreamtype)}
+walls1 = {(7,1),(7,2),(7,3),(7,9),(7,10),(7,11),(7,12),(11,3),(12,3),(13,3),(14,3),(15,3),(16,3),(11,4),(12,5),(13,6),(15,7),(13,8),(12,9),(11,10),(11,11),(12,11),(13,11),(15,11),(14,11),(16,11),(17,11),(17,3),(14,6),(14,8)}
+pointsset1 = {(5,1,3),(4,1,3),(5,12,3),(4,12,3),(4,6,1),(5,8,1),(7,6,1),(8,5,1),(10,5,1),(9,9,1),(9,11,1),(9,1,1),(13,1,1),(16,1,1),(19,1,1),(21,1,1),(21,11,1),(21,8,1),(21,4,1),(10,12,4),(10,11,4),(10,10,4),(16,6,3),(17,6,3),(18,6,3),(17,8,3),(16,9,3),(17,9,3),(2,12,1),(1,12,1),(0,12,1),(4,4,1),(4,10,1)}
+
 
 
 walls2 = {(2,2),(7,8),(9,8),(7,8),(8,8),(6,8),(10,8),(10,8),(11,8),(11,8),(13,8),(12,8),(14,8),(15,8),(16,8),(17,8),(18,8),(18,8),(19,8),(22,11),(22,10),(22,9),(22,8),(21,8),(20,8),(22,5),(22,7),(22,6),(22,4),(22,3),(22,2),(1,2),(0,2),(2,1),(2,0),(22,12),(21,12),(20,12),(18,12),(19,12),(17,12),(16,12),(15,12),(13,12),(14,12),(12,12),(11,12),(10,12),(10,12),(9,12),(8,12),(7,12),(6,12),(22,1),(22,0),(21,4),(20,4),(19,4),(17,4),(16,4),(18,4),(15,4),(14,4),(12,4),(13,4),(11,4),(9,4),(10,4),(8,4),(6,4),(7,4)}
 pointsset2 = {(5,10,1),(7,10,1),(9,10,1),(10,10,1),(12,10,1),(14,10,1),(15,10,1),(17,10,1),(18,10,1),(21,10,4),(21,6,4),(21,2,3),(5,6,1),(9,6,1),(13,6,1),(10,2,1),(14,1,1),(16,2,1),(18,1,1),(17,6,4),(19,6,4),(15,6,4),(20,3,4),(20,2,4),(20,1,4),(19,2,4),(17,2,4),(18,2,4)}
+walls3 = {(6,2),(7,3),(8,4),(8,5),(8,6),(8,7),(7,8),(6,9),(9,5),(9,6),(9,7),(9,4),(10,3),(17,4),(17,5),(17,6),(17,5),(16,5),(18,5),(2,0),(2,1),(2,2),(1,2),(0,2),(11,2),(5,9),(12,2),(5,2),(10,8),(12,9),(11,9)}
+pointsset3 = {(9,10,3),(9,9,3),(8,10,3),(8,9,3),(10,9,3),(10,10,3),(8,3,4),(9,3,4),(9,2,4),(10,2,4),(8,2,4),(8,2,4),(7,2,4),(8,1,4),(9,1,4),(21,2,1),(21,4,1),(21,6,1),(21,7,1),(21,9,1),(21,11,1),(19,12,1),(18,19,1),(12,12,1),(8,12,1),(5,12,1),(0,11,1),(0,9,1),(0,6,1),(0,3,1),(11,5,4),(11,6,4),(12,6,4),(12,5,4),(13,5,4),(13,6,4)}
+wall4 = {(2,5),(2,7),(2,8),(3,9),(4,9),(5,8),(5,6),(5,7),(2,6),(5,5),(4,4),(3,4),(10,6),(10,7),(10,8),(9,7),(11,7),(15,7),(15,6),(15,5),(16,4),(17,4),(18,5),(18,6),(18,7),(16,9),(17,9),(15,8),(18,8)}
+pointsset4 = {(8,11,3),(9,11,3),(10,11,3),(12,11,3),(6,1,1),(7,1,1),(9,1,1),(11,1,1),(12,1,1),(14,2,1),(14,1,1),(12,1,1),(10,1,1),(8,1,1),(7,2,1),(8,2,1),(9,2,1),(10,2,1),(11,2,1),(12,2,1),(21,6,3),(21,7,3),(21,8,3),(20,6,4),(20,7,4),(20,8,4),(22,6,4),(22,7,4),(22,8,4),(6,2,1),(13,1,1),(13,2,1),(11,11,3),(7,11,3),(20,5,4),(20,9,4),(22,9,4),(22,5,4),(20,4,4),(22,4,4),(21,9,3),(21,5,3),(14,7,4),(14,6,4),(6,6,4),(6,7,4),(6,8,4),(14,8,4),(6,5,4),(14,5,4)}
 
-wallslist = [walls1,walls2]
-pointslist = [pointsset1, pointsset2]
+
+
+wallslist = [walls1,walls2,walls3,wall4]
+pointslist = [pointsset1, pointsset2,pointsset3,pointsset4]
 
 walls = wallslist[LEVELSTART-1]
 pointsset = pointslist[LEVELSTART-1]
@@ -84,6 +93,26 @@ ShowAllCollisions = False
 
 HitWall = False
 PlayerAlive = False
+
+highscore = 0
+
+def save_high_score(myhighscore, filename=""):
+    filename="highscore"+str(LEVELSTART)+".txt"
+    with open(filename, "w") as file:  # file is automatically closed when with block is completed
+        file.write(str(myhighscore))
+
+def load_high_score(filename=""):
+    filename="highscore"+str(LEVELSTART)+".txt"
+    try:
+        with open(filename, "r") as file:  # file is automatically closed when with block is completed
+            return int(file.read())
+    except FileNotFoundError:
+        return 0  # Default to 0 if no high score file exists
+    
+def on_close():
+    save_high_score(highscore)  # Save score before exiting
+    mainwin.destroy()  # Close the window
+mainwin.protocol("WM_DELETE_WINDOW", on_close)  # Bind closing action
 
 def rotatepoints(points,angle,center):
          newpoints = []
@@ -194,10 +223,7 @@ def checkcollisionrect(object1,object2):
      else:
           return True
 
-mainwin = Tk()
-mainwin.geometry(str(MAXx)+"x"+str(MAXy)) 
-canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
-canvas1.place(x=0,y=0)
+
 
 myship = LEDobj(canvas1,STARTX,STARTY,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
 myship.collisionrect = (4,3,44,45)
@@ -208,7 +234,8 @@ solidlist = []
 scoreddisplay = []
 
          
-displayscore = LEDscoreobj(canvas1,x=MAXx-200,y=20,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=8)
+displayscore = LEDscoreobj(canvas1,x=200,y=10,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
+displayhighscore = LEDscoreobj(canvas1,x=MAXx-200,y=10,score=highscore,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
 
 starttime = time.time()
 
@@ -261,18 +288,20 @@ createplayfield()
 
 def updateclock():
     global PlayerAlive
-    seconds = time.time()-starttime
-    if seconds <= 7 and PlayerAlive : 
-        displayclock.update(int(abs(7-seconds)))
-    else:
-        PlayerAlive = False
-    if seconds >= 3 : displayclock.colour = "red"
+    if PlayerAlive:
+       seconds = time.time()-starttime
+       if seconds <= 7 and PlayerAlive : 
+         displayclock.update(int(abs(7-seconds)))
+       else:
+         PlayerAlive = False
+         save_high_score(highscore)
+       if seconds >= 3 : displayclock.colour = "red"
     mainwin.after(1000,updateclock)
 
 updateclock()
 
 def gameloop():
-    global HitWall, score 
+    global HitWall, score, highscore 
     if PlayerAlive: myship.move()
     for fruit in fruitlist:
        if checkcollisionrect(myship,fruit):
@@ -281,6 +310,9 @@ def gameloop():
             fruit.undraw()
             fruitlist.remove(fruit)
             score = score + fruit.PointsType
+            if score > highscore: 
+                highscore = score
+                displayhighscore.update(highscore)
             displayscore.update(score)
     for solid in solidlist:
          if checkcollisionrect(myship,solid): 
@@ -296,7 +328,7 @@ def gameloop():
 gameloop()
 
 def mykey(event):
-    global HitWall, PlayerAlive, starttime,score,walls,pointsset, LEVELSTART
+    global HitWall, PlayerAlive, starttime,score, highscore,walls,pointsset, LEVELSTART
     key = event.keysym
     if key in ["1","2","3","4"]:
         LEVELSTART = int(key)
@@ -308,8 +340,12 @@ def mykey(event):
         createplayfield()
         myship.resetposition(STARTX,STARTY)
         score = 0
+        highscore = load_high_score()
+        print("highscore = ",highscore)
         displayclock.colour = "lightgreen"
         displayclock.update(7)
+        displayhighscore.update(highscore)
+        displayscore.update(score)
     if HitWall:
          HitWall = False
     elif   key == "w":
