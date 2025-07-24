@@ -13,7 +13,12 @@ os.chdir(current_script_directory)
 
 # TODO
 # add some new fruit
-# after pressing 1-9, display 3 ... 2 ... 1 ... GO!
+# level 0 for demo + title + instructions
+# Show level number at top
+# LED VERTICAL STRIP RED bottom, ORANGE middle, GREEN top. LOOK at pinball
+# RED LED : okay score
+# ORANGE : GOOD
+# GREEN : Very GOOd
 # math symbols and identities for levels
 # 2x flags
 # 2x+1 flags
@@ -53,7 +58,7 @@ MAXy = 400
 STARTX = 0  # start location of car
 STARTY = MAXy//2-10
 
-LEVELSTART = 2   # change with start keys 1,2,3,...,9
+LEVELSTART = 0   # change with start keys 1,2,3,...,9
 
 # do not change these o/w leveleditor will not work correctly
 popiscletype  = 1
@@ -71,27 +76,29 @@ canvas1 = Canvas(mainwin,width=MAXx,height= MAXy,bg="black")
 canvas1.place(x=0,y=0)
 
 # {...} is a set. Take union with {..} | {..}
+walls0 = {(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(7,3),(9,3),(8,3),(10,3),(11,3),(12,3),(13,3),(14,3),(15,3),(16,3),(17,3),(18,3),(19,3),(20,3),(21,3),(22,3),(23,3),(0,8),(1,8),(2,8),(3,8),(4,8),(5,8),(5,8),(6,8),(7,8),(8,8),(9,8),(10,8),(11,8),(12,8),(13,8),(14,8),(15,8),(16,8),(17,8),(18,8),(19,8),(20,8),(21,8),(22,8),(23,8)}
+pointsset0 = {(5,5,1),(5,6,1),(7,5,5),(7,6,5),(9,5,3),(9,6,3),(11,5,4),(11,6,4),(13,5,6),(13,6,6),(15,5,7),(15,6,7)}
+
+
 walls1 = {(7,1),(7,2),(7,3),(7,9),(7,10),(7,11),(7,12),(11,3),(12,3),(13,3),(14,3),(15,3),(16,3),(11,4),(12,5),(13,6),(15,7),(13,8),(12,9),(11,10),(11,11),(12,11),(13,11),(15,11),(14,11),(16,11),(17,11),(17,3),(14,6),(14,8)}
 pointsset1 = {(5,1,3),(4,1,3),(5,12,3),(4,12,3),(4,6,1),(5,8,1),(7,6,1),(8,5,1),(10,5,1),(9,9,1),(9,11,1),(9,1,1),(13,1,1),(16,1,1),(19,1,1),(21,1,1),(21,11,1),(21,8,1),(21,4,1),(10,12,4),(10,11,4),(10,10,4),(16,6,3),(17,6,3),(18,6,3),(17,8,3),(16,9,3),(17,9,3),(2,12,1),(1,12,1),(0,12,1),(4,4,1),(4,10,1)}
 
-
-
 walls2 = {(7,8),(9,8),(7,8),(8,8),(6,8),(10,8),(10,8),(11,8),(11,8),(13,8),(12,8),(14,8),(15,8),(16,8),(17,8),(18,8),(18,8),(19,8),(22,11),(22,10),(22,9),(22,8),(21,8),(20,8),(22,5),(22,7),(22,6),(22,4),(22,3),(22,2),(22,12),(21,12),(20,12),(18,12),(19,12),(17,12),(16,12),(15,12),(13,12),(14,12),(12,12),(11,12),(10,12),(10,12),(9,12),(8,12),(7,12),(6,12),(22,1),(22,0),(21,4),(20,4),(19,4),(17,4),(16,4),(18,4),(15,4),(14,4),(12,4),(13,4),(11,4),(9,4),(10,4),(8,4),(6,4),(7,4)}
 pointsset2 = {(5,10,1),(7,10,1),(9,10,1),(10,10,1),(12,10,1),(14,10,1),(15,10,1),(17,10,1),(18,10,1),(21,10,4),(21,6,4),(21,2,3),(5,6,1),(9,6,1),(13,6,1),(10,2,1),(14,1,1),(16,2,1),(18,1,1),(17,6,4),(19,6,4),(15,6,4),(20,3,4),(20,2,4),(20,1,4),(19,2,4),(17,2,4),(18,2,4),(5,10,1),(7,10,1),(9,10,1),(10,10,1),(12,10,1),(14,10,1),(15,10,1),(17,10,1),(18,10,1),(21,10,4),(21,6,4),(21,2,3),(5,6,1),(9,6,1),(13,6,1),(10,2,1),(14,1,1),(16,2,1),(18,1,1),(17,6,4),(19,6,4),(15,6,4),(20,3,4),(20,2,4),(20,1,4),(19,2,4),(17,2,4),(18,2,4),(5,12,6),(5,0,7)}
+
 walls3 = {(6,2),(7,3),(8,4),(8,5),(8,6),(8,7),(7,8),(6,9),(9,5),(9,6),(9,7),(9,4),(10,3),(17,4),(17,5),(17,6),(17,5),(16,5),(18,5),(11,2),(5,9),(12,2),(5,2),(10,8),(12,9),(11,9)}
 pointsset3 = {(9,10,3),(9,9,3),(8,10,3),(8,9,3),(10,9,3),(10,10,3),(8,3,4),(9,3,4),(9,2,4),(10,2,4),(8,2,4),(8,2,4),(7,2,4),(8,1,4),(9,1,4),(21,2,1),(21,4,1),(21,6,1),(21,7,1),(21,9,1),(21,11,1),(19,12,1),(18,19,1),(12,12,1),(8,12,1),(5,12,1),(0,11,1),(0,9,1),(0,6,1),(0,3,1),(11,5,4),(11,6,4),(12,6,4),(12,5,4),(13,5,4),(13,6,4)}
+
 wall4 = {(2,5),(2,7),(2,8),(3,9),(4,9),(5,8),(5,6),(5,7),(2,6),(5,5),(4,4),(3,4),(10,6),(10,7),(10,8),(9,7),(11,7),(15,7),(15,6),(15,5),(16,4),(17,4),(18,5),(18,6),(18,7),(16,9),(17,9),(15,8),(18,8)}
 pointsset4 = {(8,11,3),(9,11,3),(10,11,3),(12,11,3),(6,1,1),(7,1,1),(9,1,1),(11,1,1),(12,1,1),(14,2,1),(14,1,1),(12,1,1),(10,1,1),(8,1,1),(7,2,1),(8,2,1),(9,2,1),(10,2,1),(11,2,1),(12,2,1),(21,6,3),(21,7,3),(21,8,3),(20,6,4),(20,7,4),(20,8,4),(22,6,4),(22,7,4),(22,8,4),(6,2,1),(13,1,1),(13,2,1),(11,11,3),(7,11,3),(20,5,4),(20,9,4),(22,9,4),(22,5,4),(20,4,4),(22,4,4),(21,9,3),(21,5,3),(14,7,4),(14,6,4),(6,6,4),(6,7,4),(6,8,4),(14,8,4),(6,5,4),(14,5,4)}
 
 
 
-wallslist = [walls1,walls2,walls3,wall4]
-pointslist = [pointsset1, pointsset2,pointsset3,pointsset4]
+wallslist = [walls0,walls1,walls2,walls3,wall4]
+pointslist = [pointsset0,pointsset1, pointsset2,pointsset3,pointsset4]
 
-walls = wallslist[LEVELSTART-1]
-pointsset = pointslist[LEVELSTART-1]
-
-
+walls = wallslist[LEVELSTART]
+pointsset = pointslist[LEVELSTART]
 
 score = 0
 
@@ -233,11 +240,13 @@ def checkcollisionrect(object1,object2):
 
 myship = LEDobj(canvas1,STARTX,STARTY,dx = 0,dy = 0,CharPoints=charRallyX, pixelsize = 2,typestring = "car")
 myship.collisionrect = (4,3,44,45)
+myship.rotate(90)
 if ShowAllCollisions: myship.showcollisionrect()
 
 fruitlist = []
 solidlist = []
 scoreddisplay = []
+countdowndisplay = []
 
          
 displayscore = LEDscoreobj(canvas1,x=200,y=10,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
@@ -320,7 +329,8 @@ updateclock()
 
 def gameloop():
     global HitWall, score, highscore 
-    if PlayerAlive: myship.move()
+    if LEVELSTART == 0: myship.dx = 2
+    if PlayerAlive or LEVELSTART == 0: myship.move()
     for fruit in fruitlist:
        if checkcollisionrect(myship,fruit):
             pointsawarded = LEDscoreobj(canvas1,x=fruit.x-7,y=fruit.y+10,score=fruit.PointsType,colour="white",pixelsize=2, charwidth = 12)
@@ -343,48 +353,73 @@ def gameloop():
             break # exit the for loop
     mainwin.after(10,gameloop)
 
+def startgame():
+    global starttime
+    starttime = time.time()
 
-highscore = load_high_score()
-displayclock.colour = "lightgreen"
-displayhighscore.update(highscore)
-displayscore.update(score)
-displayclock.update(7)
-starttime = time.time()
+def setlevel():
+    global walls,pointsset,score, highscore
+    eraseplayfield()
+    walls = wallslist[LEVELSTART]
+    pointsset = pointslist[LEVELSTART]
+    createplayfield()
+    myship.resetposition(STARTX,STARTY)
+    score = 0
+    highscore = load_high_score()
+    displayclock.colour = "lightgreen"
+    displayhighscore.update(highscore)
+    displayscore.update(score)
+    displayclock.update(7)
+
+setlevel()
+startgame()
 gameloop()
+counttime = time.time()
+
+
+displaycountdown = LEDscoreobj(canvas1,x=MAXx//3,y=MAXy//4,score=3,colour="Orange",pixelsize=26, charwidth = 24,numzeros=0)
+displaycountdown.undraw()
+
+def countdown():
+    global displaycountdown, PlayerAlive
+    if (time.time() - counttime <= 3.1) and LEVELSTART > 0:
+           displaycountdown.update(3-int((time.time()-counttime)))
+           mainwin.after(500,countdown)    
+    else:
+           displaycountdown.undraw()
+           if LEVELSTART > 0 : PlayerAlive = True
+           startgame()
+       
 
 def mykey(event):
-    global HitWall, PlayerAlive, starttime,score, highscore,walls,pointsset, LEVELSTART
+    global HitWall, PlayerAlive, starttime,score, highscore,walls,pointsset, LEVELSTART, counttime
     key = event.keysym
-    if key in ["1","2","3","4"]:
-        LEVELSTART = int(key)
-        PlayerAlive = True
-        eraseplayfield()
-        walls = wallslist[LEVELSTART-1]
-        pointsset = pointslist[LEVELSTART-1]
-        createplayfield()
-        myship.resetposition(STARTX,STARTY)
-        score = 0
-        highscore = load_high_score()
+    if key in ["0","1","2","3","4"]:
+        PlayerAlive = False
+        myship.rotate(90)
+        myship.dy = 0
+        myship.dx = STEPD
         displayclock.colour = "lightgreen"
-        displayhighscore.update(highscore)
-        displayscore.update(score)
         displayclock.update(7)
-        starttime = time.time()
+        LEVELSTART = int(key)
+        setlevel()
+        counttime = time.time()
+        countdown()
     if HitWall:
          HitWall = False
-    elif   key == "w" or key == "Up":
+    elif (key == "w" or key == "Up") and LEVELSTART > 0:
          myship.rotate(0)
          myship.dy = -STEPD
          myship.dx = 0
-    elif key == "d" or key == "Right":
+    elif (key == "d" or key == "Right") and LEVELSTART > 0:
          myship.rotate(90)
          myship.dy = 0
          myship.dx = STEPD
-    elif key == "a" or key == "Left":
+    elif (key == "a" or key == "Left") and LEVELSTART > 0:
          myship.rotate(270)
          myship.dy = 0
          myship.dx = -STEPD
-    elif key == "s" or key == "Down":
+    elif (key == "s" or key == "Down") and LEVELSTART > 0:
          myship.rotate(180)
          myship.dy = STEPD
          myship.dx = 0
