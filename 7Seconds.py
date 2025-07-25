@@ -12,14 +12,14 @@ current_script_directory = os.path.dirname(os.path.abspath(__file__))
 os.chdir(current_script_directory)
 
 # TODO
-# add some new fruit
 # level 0 for demo + title + instructions
-# Show level number at top
+# random bright colours for scores 100,200, etc
 # LED VERTICAL STRIP RED bottom, ORANGE middle, GREEN top. LOOK at pinball
 # RED LED : okay score
 # ORANGE : GOOD
 # GREEN : Very GOOd
 # math symbols and identities for levels
+# icon buttons at botton for choosing levels
 # 2x flags
 # 2x+1 flags
 
@@ -52,8 +52,9 @@ def block(x,y,n): # make an nxn block at (x,y)
 
 STEPD = 4 # speed of car. This changes dx,dy.
 
-MAXx = 700
-MAXy = 400
+MAXx = 800
+MAXy = 600
+DOWNOFFSET = 100
 
 STARTX = 0  # start location of car
 STARTY = MAXy//2-10
@@ -216,6 +217,29 @@ class LEDscoreobj:
         self.score = myscore
         self.draw()
 
+class LEDtextobj:
+    def __init__(self, canvas,x=0,y=0, text = "", colour = "white", pixelsize = 2, charwidth=23):
+         self.x = x
+         self.y = y
+         self.text = text
+         self.canvas = canvas
+         self.LEDPoints = []
+         self.colour = colour
+         self.pixelsize = pixelsize
+         self.charwidth = charwidth
+         self.draw()
+    def draw(self):
+        self.undraw()
+        LEDlib.charwidth = self.charwidth
+        LEDlib.psize = self.pixelsize
+        LEDlib.ShowColourText(self.canvas,self.x,self.y,self.colour,self.text,self.LEDPoints) 
+    def undraw(self):
+         for p in self.LEDPoints:
+            self.canvas.delete(p)
+         self.LEDPoints.clear()
+    def update(self,mytext):
+        self.text = mytext
+        self.draw()
 
 
 
@@ -249,17 +273,25 @@ scoreddisplay = []
 countdowndisplay = []
 
          
-displayscore = LEDscoreobj(canvas1,x=200,y=10,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
-displayhighscore = LEDscoreobj(canvas1,x=MAXx-200,y=10,score=highscore,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
+displayscore = LEDscoreobj(canvas1,x=210,y=10,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
+displaytextscore = LEDtextobj(canvas1,x=235,y=35,text="SCORE",colour="yellow",pixelsize = 2, charwidth=12)
+
+displayhighscore = LEDscoreobj(canvas1,x=MAXx-121,y=10,score=highscore,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
+displaytexthighscore = LEDtextobj(canvas1,x=MAXx-105,y=35,text="HISCORE",colour="yellow",pixelsize = 2, charwidth=12)
+
+dlx = 50
+displaylevel = LEDscoreobj(canvas1,x=MAXx//2+20+dlx,y=10,score=LEVELSTART,colour="white",pixelsize=3, charwidth = 24,numzeros=0)
+displaytextlevel = LEDtextobj(canvas1,x=MAXx//2+dlx,y=35,text="LEVEL",colour="yellow",pixelsize = 2, charwidth=12)
+
 
 starttime = time.time()
 
 displayclock = LEDscoreobj(canvas1,x=10,y=10,score=7,colour="light green",pixelsize=6, charwidth = 24,numzeros=0)
-
+displayclocktext = LEDtextobj(canvas1,x=60,y=30,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
 
 def makewalls():
     for x,y in walls:
-        wall = LEDobj(canvas1,x*wallsize-8,y*wallsize-8,dx = 0,dy = 0,CharPoints=charWall2, pixelsize = 2,typestring = "solid")
+        wall = LEDobj(canvas1,x*wallsize-8,y*wallsize-8+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charWall2, pixelsize = 2,typestring = "solid")
         wall.collisionrect = (8,8,40,40)
         solidlist.append(wall) 
 
@@ -267,36 +299,36 @@ def createplayfield():
    makewalls()
    for x,y,stype in pointsset:
        if stype == popiscletype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charPopsicle, pixelsize = 2,typestring = "fruit")
            fruit.collisionrect = (0,0,16,36)
            fruit.PointsType = 100
            fruitlist.append(fruit)
        if stype == strawberrytype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charPacmanStrawberry, pixelsize = 2,typestring = "fruit")
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charPacmanStrawberry, pixelsize = 2,typestring = "fruit")
            fruit.collisionrect = (0,6,22,30)
            fruit.PointsType = 200
            #fruit.showcollisionrect()
            fruitlist.append(fruit)
        if stype == chipstype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charChips, pixelsize = 2,typestring = "fruit")
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charChips, pixelsize = 2,typestring = "fruit")
            fruit.collisionrect = (0,0,22,32)
            fruit.PointsType = 300
            #fruit.showcollisionrect()
            fruitlist.append(fruit)
        if stype == icecreamtype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charIceCream, pixelsize = 2,typestring = "fruit")
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charIceCream, pixelsize = 2,typestring = "fruit")
            fruit.collisionrect = (0,0,17,32)
            fruit.PointsType = 400
            #fruit.showcollisionrect()
            fruitlist.append(fruit)
        if stype == cherrytype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charPacmanCherry, pixelsize = 2,typestring = "fruit")
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charPacmanCherry, pixelsize = 2,typestring = "fruit")
            fruit.collisionrect = (0,4,24,28)
            fruit.PointsType = 500
            #fruit.showcollisionrect()
            fruitlist.append(fruit)
        if stype == orangetype:
-           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize,dx = 0,dy = 0,CharPoints=charOrange, pixelsize = 2,typestring = "fruit")
+           fruit = LEDobj(canvas1,x*wallsize+8,y*wallsize+DOWNOFFSET,dx = 0,dy = 0,CharPoints=charOrange, pixelsize = 2,typestring = "fruit")
            fruit.collisionrect = (2,0,29,32)
            fruit.PointsType = 600
            #fruit.showcollisionrect()
@@ -402,6 +434,7 @@ def mykey(event):
         displayclock.colour = "lightgreen"
         displayclock.update(7)
         LEVELSTART = int(key)
+        displaylevel.update(LEVELSTART)
         setlevel()
         counttime = time.time()
         countdown()
