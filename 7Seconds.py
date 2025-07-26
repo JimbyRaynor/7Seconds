@@ -288,6 +288,9 @@ starttime = time.time()
 
 displayclock = LEDscoreobj(canvas1,x=10,y=10,score=7,colour="light green",pixelsize=6, charwidth = 24,numzeros=0)
 displayclocktext = LEDtextobj(canvas1,x=60,y=30,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
+displayclocktext2 = LEDtextobj(canvas1,x=30,y=150,text="ABCDEFGHIJKLMNOPRSTUVWXYZ",colour="light green",pixelsize = 3, charwidth=24)
+
+
 
 def makewalls():
     for x,y in walls:
@@ -350,7 +353,7 @@ def updateclock():
     if PlayerAlive:
        seconds = time.time()-starttime
        if seconds <= 7.1 and PlayerAlive : 
-         displayclock.update(int(abs(7.1-seconds)))
+         displayclock.update(int(abs(7.9-seconds)))
        else:
          PlayerAlive = False
          save_high_score(highscore)
