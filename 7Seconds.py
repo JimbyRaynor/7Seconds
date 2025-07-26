@@ -13,11 +13,10 @@ os.chdir(current_script_directory)
 
 # TODO
 # level 0 for demo + title + instructions
-# random bright colours for scores 100,200, etc
 # LED VERTICAL STRIP RED bottom, ORANGE middle, GREEN top. LOOK at pinball
 # RED LED : okay score
 # ORANGE : GOOD
-# GREEN : Very GOOd
+# GREEN : Very GOOd (test tube filling meter?)
 # math symbols and identities for levels
 # icon buttons at botton for choosing levels
 # 2x flags
@@ -193,7 +192,7 @@ class LEDobj:
          self.collisionimage = canvas1.create_rectangle(self.x+x1,self.y+y1,self.x+x2,self.y+y2,fill="", outline = "white") 
          
 class LEDscoreobj:
-    def __init__(self, canvas,x=0,y=0, score = 0, colour = "white", pixelsize = 2, charwidth=23, numzeros = 0):
+    def __init__(self, canvas,x=0,y=0, score = 0, colour = "white", pixelsize = 2, charwidth=23, numzeros = 0, solid = False, bg = True):
          self.x = x
          self.y = y
          self.score = score
@@ -203,12 +202,14 @@ class LEDscoreobj:
          self.pixelsize = pixelsize
          self.charwidth = charwidth
          self.numzeros = numzeros 
+         self.solid = solid
+         self.bg = bg
          self.draw()
     def draw(self):
         self.undraw()
         LEDlib.charwidth = self.charwidth
         LEDlib.psize = self.pixelsize
-        LEDlib.ShowColourScore(self.canvas,self.x,self.y,self.colour,self.score,self.LEDPoints, self.numzeros) 
+        LEDlib.ShowColourScore2(self.canvas,self.x,self.y,self.colour,self.score,self.LEDPoints, self.numzeros, self.solid, self.bg) 
     def undraw(self):
          for p in self.LEDPoints:
             self.canvas.delete(p)
@@ -218,7 +219,7 @@ class LEDscoreobj:
         self.draw()
 
 class LEDtextobj:
-    def __init__(self, canvas,x=0,y=0, text = "", colour = "white", pixelsize = 2, charwidth=23):
+    def __init__(self, canvas,x=0,y=0, text = "", colour = "white", pixelsize = 2, charwidth=23, solid = False, bg = True):
          self.x = x
          self.y = y
          self.text = text
@@ -227,12 +228,14 @@ class LEDtextobj:
          self.colour = colour
          self.pixelsize = pixelsize
          self.charwidth = charwidth
+         self.solid = solid
+         self.bg = bg
          self.draw()
     def draw(self):
         self.undraw()
         LEDlib.charwidth = self.charwidth
         LEDlib.psize = self.pixelsize
-        LEDlib.ShowColourText(self.canvas,self.x,self.y,self.colour,self.text,self.LEDPoints) 
+        LEDlib.ShowColourText2(self.canvas,self.x,self.y,self.colour,self.text,self.LEDPoints, self.solid, self.bg) 
     def undraw(self):
          for p in self.LEDPoints:
             self.canvas.delete(p)
@@ -274,21 +277,20 @@ countdowndisplay = []
 
          
 displayscore = LEDscoreobj(canvas1,x=210,y=10,score=0,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
-displaytextscore = LEDtextobj(canvas1,x=235,y=35,text="SCORE",colour="yellow",pixelsize = 2, charwidth=12)
+displaytextscore = LEDtextobj(canvas1,x=235,y=35,text="SCORE",colour="yellow",pixelsize = 2, charwidth=14, solid = True)
 
 displayhighscore = LEDscoreobj(canvas1,x=MAXx-121,y=10,score=highscore,colour="white",pixelsize=3, charwidth = 24,numzeros=5)
-displaytexthighscore = LEDtextobj(canvas1,x=MAXx-105,y=35,text="HISCORE",colour="yellow",pixelsize = 2, charwidth=12)
+displaytexthighscore = LEDtextobj(canvas1,x=MAXx-105,y=35,text="HISCORE",colour="yellow",pixelsize = 2, charwidth=14, solid = True)
 
 dlx = 50
 displaylevel = LEDscoreobj(canvas1,x=MAXx//2+20+dlx,y=10,score=LEVELSTART,colour="white",pixelsize=3, charwidth = 24,numzeros=0)
-displaytextlevel = LEDtextobj(canvas1,x=MAXx//2+dlx,y=35,text="LEVEL",colour="yellow",pixelsize = 2, charwidth=12)
+displaytextlevel = LEDtextobj(canvas1,x=MAXx//2+dlx,y=35,text="LEVEL",colour="yellow",pixelsize = 2, charwidth=14, solid = True)
 
 
 starttime = time.time()
 
 displayclock = LEDscoreobj(canvas1,x=10,y=10,score=7,colour="light green",pixelsize=6, charwidth = 24,numzeros=0)
-displayclocktext = LEDtextobj(canvas1,x=60,y=30,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
-displayclocktext2 = LEDtextobj(canvas1,x=30,y=150,text="ABCDEFGHIJKLMNOPRSTUVWXYZ",colour="light green",pixelsize = 3, charwidth=24)
+displayclocktext = LEDtextobj(canvas1,x=54,y=30,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
 
 
 
@@ -357,7 +359,7 @@ def updateclock():
        else:
          PlayerAlive = False
          save_high_score(highscore)
-       if seconds >= 3 : displayclock.colour = "red"
+       if seconds >= 4 : displayclock.colour = "red"
     mainwin.after(100,updateclock)
 
 updateclock()
@@ -368,7 +370,7 @@ def gameloop():
     if PlayerAlive or LEVELSTART == 0: myship.move()
     for fruit in fruitlist:
        if checkcollisionrect(myship,fruit):
-            pointsawarded = LEDscoreobj(canvas1,x=fruit.x-7,y=fruit.y+10,score=fruit.PointsType,colour="white",pixelsize=2, charwidth = 12)
+            pointsawarded = LEDscoreobj(canvas1,x=fruit.x-7,y=fruit.y+10,score=fruit.PointsType,colour="yellow",pixelsize=2, charwidth = 15, solid = True, bg = False)
             scoreddisplay.append(pointsawarded)
             fruit.undraw()
             fruitlist.remove(fruit)
@@ -412,7 +414,7 @@ gameloop()
 counttime = time.time()
 
 
-displaycountdown = LEDscoreobj(canvas1,x=MAXx//3,y=MAXy//4,score=3,colour="Orange",pixelsize=26, charwidth = 24,numzeros=0)
+displaycountdown = LEDscoreobj(canvas1,x=MAXx//4,y=MAXy//4,score=3,colour="orange",pixelsize=50, charwidth = 24,numzeros=0, solid = False, bg = False)
 displaycountdown.undraw()
 
 def countdown():
