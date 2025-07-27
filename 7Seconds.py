@@ -13,14 +13,12 @@ os.chdir(current_script_directory)
 
 # TODO
 # level 0 for demo + title + instructions
-# LED VERTICAL STRIP RED bottom, ORANGE middle, GREEN top. LOOK at pinball
-# RED LED : okay score
-# ORANGE : GOOD
-# GREEN : Very GOOd (test tube filling meter?)
+# progressbar list of max scores for each level
 # math symbols and identities for levels
 # icon buttons at botton for choosing levels
 # 2x flags
 # 2x+1 flags
+# LEVEL5 : 4 x 100, 4 X 200, or 100+200+330+400+500+600, etc
 
 
 # pinball like? bouncers, speed increasers, ?
@@ -80,8 +78,8 @@ walls0 = {(0,3),(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(7,3),(9,3),(8,3),(10,3),(11
 pointsset0 = {(5,5,1),(5,6,1),(7,5,5),(7,6,5),(9,5,3),(9,6,3),(11,5,4),(11,6,4),(13,5,6),(13,6,6),(15,5,7),(15,6,7)}
 
 
-walls1 = {(7,1),(7,2),(7,3),(7,9),(7,10),(7,11),(7,12),(11,3),(12,3),(13,3),(14,3),(15,3),(16,3),(11,4),(12,5),(13,6),(15,7),(13,8),(12,9),(11,10),(11,11),(12,11),(13,11),(15,11),(14,11),(16,11),(17,11),(17,3),(14,6),(14,8)}
-pointsset1 = {(5,1,3),(4,1,3),(5,12,3),(4,12,3),(4,6,1),(5,8,1),(7,6,1),(8,5,1),(10,5,1),(9,9,1),(9,11,1),(9,1,1),(13,1,1),(16,1,1),(19,1,1),(21,1,1),(21,11,1),(21,8,1),(21,4,1),(10,12,4),(10,11,4),(10,10,4),(16,6,3),(17,6,3),(18,6,3),(17,8,3),(16,9,3),(17,9,3),(2,12,1),(1,12,1),(0,12,1),(4,4,1),(4,10,1)}
+walls1 = {(7,1),(7,2),(7,9),(7,10),(17,2),(16,2),(15,2),(14,2),(13,2),(12,2),(11,2),(11,3),(12,4),(13,5),(15,6),(14,6),(14,7),(13,7),(12,8),(11,9),(11,10),(12,10),(13,10),(14,10),(15,10),(16,10),(17,10)}
+pointsset1 = {(4,1,3),(5,12,3),(4,6,1),(5,8,1),(7,6,1),(21,8,1),(21,4,1),(2,12,1),(4,4,1),(4,10,1),(21,11,7),(21,1,6),(13,12,5),(16,12,6),(9,10,4),(9,12,4),(9,11,4),(17,6,3),(17,8,3),(9,5,1),(9,7,6),(9,0,1),(12,0,1),(15,0,1),(17,0,1)}
 
 walls2 = {(7,8),(9,8),(7,8),(8,8),(6,8),(10,8),(10,8),(11,8),(11,8),(13,8),(12,8),(14,8),(15,8),(16,8),(17,8),(18,8),(18,8),(19,8),(22,11),(22,10),(22,9),(22,8),(21,8),(20,8),(22,5),(22,7),(22,6),(22,4),(22,3),(22,2),(22,12),(21,12),(20,12),(18,12),(19,12),(17,12),(16,12),(15,12),(13,12),(14,12),(12,12),(11,12),(10,12),(10,12),(9,12),(8,12),(7,12),(6,12),(22,1),(22,0),(21,4),(20,4),(19,4),(17,4),(16,4),(18,4),(15,4),(14,4),(12,4),(13,4),(11,4),(9,4),(10,4),(8,4),(6,4),(7,4)}
 pointsset2 = {(5,10,1),(7,10,1),(9,10,1),(10,10,1),(12,10,1),(14,10,1),(15,10,1),(17,10,1),(18,10,1),(21,10,4),(21,6,4),(21,2,3),(5,6,1),(9,6,1),(13,6,1),(10,2,1),(14,1,1),(16,2,1),(18,1,1),(17,6,4),(19,6,4),(15,6,4),(20,3,4),(20,2,4),(20,1,4),(19,2,4),(17,2,4),(18,2,4),(5,10,1),(7,10,1),(9,10,1),(10,10,1),(12,10,1),(14,10,1),(15,10,1),(17,10,1),(18,10,1),(21,10,4),(21,6,4),(21,2,3),(5,6,1),(9,6,1),(13,6,1),(10,2,1),(14,1,1),(16,2,1),(18,1,1),(17,6,4),(19,6,4),(15,6,4),(20,3,4),(20,2,4),(20,1,4),(19,2,4),(17,2,4),(18,2,4),(5,12,6),(5,0,7)}
@@ -96,6 +94,7 @@ pointsset4 = {(8,11,3),(9,11,3),(10,11,3),(12,11,3),(6,1,1),(7,1,1),(9,1,1),(11,
 
 wallslist = [walls0,walls1,walls2,walls3,wall4]
 pointslist = [pointsset0,pointsset1, pointsset2,pointsset3,pointsset4]
+maxlist = [2100,5000,5000,5000,5000,5000,5000] # max score for levels 0, ...
 
 walls = wallslist[LEVELSTART]
 pointsset = pointslist[LEVELSTART]
@@ -177,9 +176,9 @@ class LEDobj:
          self.x = self.x + self.dx
          self.y = self.y + self.dy
          if self.x > MAXx-48: self.x = MAXx-48
-         if self.y > MAXy-48: self.y = MAXy-48
+         if self.y > MAXy-120: self.y = MAXy-120
          if self.x < 0 : self.x = 0
-         if self.y < 0 : self.y = 0
+         if self.y < 54 : self.y = 54
          self.draw()
     def rotate(self,angledeg):
          centerx = sum(x for x,y,z in self.OriginalCharPoints)/len(self.OriginalCharPoints)
@@ -244,6 +243,36 @@ class LEDtextobj:
         self.text = mytext
         self.draw()
 
+class LEDbarobj:
+    def __init__(self, canvas,x=0,y=0,dx=0,dy=-1,n=9, pixelsize = 2, score = 20, max = 5000):
+         self.x = x
+         self.y = y
+         self.dx = dx
+         self.dy = dy
+         self.n = n
+         self.canvas = canvas
+         self.LEDPoints = []
+         self.pixelsize = pixelsize
+         self.score = score
+         self.max = max
+         self.draw()
+    def draw(self):
+        self.undraw()
+        height = int(self.n*(self.score/self.max))
+        barcolour = "red"
+        if height >= 3: barcolour = "orange"
+        if height >= 5: barcolour = "light green"
+        if height >= 6: barcolour = "yellow"
+        LEDlib.psize = self.pixelsize
+        LEDlib.pixellinetriple(self.canvas,x=self.x,y=self.y,dx=self.dx,dy=self.dy,n=height,colour=barcolour,LEDpoints=self.LEDPoints) 
+    def undraw(self):
+         for p in self.LEDPoints:
+            self.canvas.delete(p)
+         self.LEDPoints.clear()
+    def update(self,score,max):
+        self.score = score
+        self.max = max
+        self.draw()
 
 
 
@@ -289,9 +318,16 @@ displaytextlevel = LEDtextobj(canvas1,x=MAXx//2+dlx,y=35,text="LEVEL",colour="ye
 
 starttime = time.time()
 
-displayclock = LEDscoreobj(canvas1,x=10,y=10,score=7,colour="light green",pixelsize=6, charwidth = 24,numzeros=0)
-displayclocktext = LEDtextobj(canvas1,x=54,y=30,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
+displayclock = LEDscoreobj(canvas1,x=6,y=10,score=7,colour="light green",pixelsize=6, charwidth = 24,numzeros=0, solid = False, bg = False)
+displayclocktext = LEDtextobj(canvas1,x=45,y=25,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
 
+alphabet = LEDtextobj(canvas1,x=10,y=540,text="ABCDEFGHIJKLMNOPQRSTUVWXYZ",colour="light green",pixelsize = 4, charwidth=30)
+
+LEDpoints = []
+LEDlib.pixelline(canvas1,x=0,y=52,dx=1,dy=0,n= 200, colour= "light green", LEDpoints=LEDpoints)
+LEDlib.pixelline(canvas1,x=0,y=MAXy-70,dx=1,dy=0,n= 200, colour= "light green", LEDpoints=LEDpoints)
+
+progressbar = LEDbarobj(canvas1,x=340,y=27,dx=0,dy=-1,n=6,pixelsize=4,score = 00,max=5000)
 
 
 def makewalls():
@@ -350,16 +386,31 @@ def eraseplayfield():
 
 createplayfield()
 
+def smalldisplayclock():
+    displayclock.pixelsize = 5
+    displayclock.x = 8 # 10
+    displayclock.y = 12 # 10
+
+def resetdisplayclock():
+    displayclock.colour = "lightgreen"
+    displayclock.update(7)
+    displayclock.pixelsize = 6
+    displayclock.x =  10
+    displayclock.y =  6
+
+
 def updateclock():
     global PlayerAlive
     if PlayerAlive:
        seconds = time.time()-starttime
+       if seconds > 1: smalldisplayclock()
        if seconds <= 7.1 and PlayerAlive : 
          displayclock.update(int(abs(7.9-seconds)))
        else:
          PlayerAlive = False
          save_high_score(highscore)
-       if seconds >= 4 : displayclock.colour = "red"
+       if seconds >= 3 : displayclock.colour = "orange"
+       if seconds >= 5 : displayclock.colour = "red"
     mainwin.after(100,updateclock)
 
 updateclock()
@@ -375,6 +426,7 @@ def gameloop():
             fruit.undraw()
             fruitlist.remove(fruit)
             score = score + fruit.PointsType
+            progressbar.update(score, progressbar.max)
             if score > highscore: 
                 highscore = score
                 displayhighscore.update(highscore)
@@ -407,6 +459,7 @@ def setlevel():
     displayhighscore.update(highscore)
     displayscore.update(score)
     displayclock.update(7)
+    progressbar.update(0, maxlist[LEVELSTART])
 
 setlevel()
 startgame()
@@ -419,8 +472,9 @@ displaycountdown.undraw()
 
 def countdown():
     global displaycountdown, PlayerAlive
-    if (time.time() - counttime <= 3.1) and LEVELSTART > 0:
-           displaycountdown.update(3-int((time.time()-counttime)))
+    elapsedtime = time.time() - counttime
+    if (elapsedtime <= 3.1) and LEVELSTART > 0:
+           displaycountdown.update(3-int(elapsedtime))
            mainwin.after(500,countdown)    
     else:
            displaycountdown.undraw()
@@ -436,8 +490,7 @@ def mykey(event):
         myship.rotate(90)
         myship.dy = 0
         myship.dx = STEPD
-        displayclock.colour = "lightgreen"
-        displayclock.update(7)
+        resetdisplayclock()
         LEVELSTART = int(key)
         displaylevel.update(LEVELSTART)
         setlevel()

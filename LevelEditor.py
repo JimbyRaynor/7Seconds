@@ -215,7 +215,7 @@ def ReadFruitData():
               mychar = charPacmanCherry
           if typenumber == orangetype:
               mychar = charOrange
-          fruit = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "wall")
+          fruit = LEDobj(canvas1,x*wallsize,y*wallsize,dx = 0,dy = 0,CharPoints=mychar, pixelsize = 2,typestring = "fruit")
           fruit.typenumber = typenumber
           fruitlist.append(fruit)
           count = count + 1
