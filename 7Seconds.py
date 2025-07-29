@@ -12,8 +12,6 @@ current_script_directory = os.path.dirname(os.path.abspath(__file__))
 os.chdir(current_script_directory)
 
 # TODO
-# level 0 for demo + title + instructions
-# progressbar list of max scores for each level
 # math symbols and identities for levels
 # icon buttons at botton for choosing levels
 # 2x flags
@@ -218,7 +216,7 @@ class LEDscoreobj:
         self.draw()
 
 class LEDtextobj:
-    def __init__(self, canvas,x=0,y=0, text = "", colour = "white", pixelsize = 2, charwidth=23, solid = False, bg = True):
+    def __init__(self, canvas,x=0,y=0, text = "", colour = "white", pixelsize = 2, charwidth=23, solid = False, bg = False):
          self.x = x
          self.y = y
          self.text = text
@@ -319,7 +317,7 @@ displaytextlevel = LEDtextobj(canvas1,x=MAXx//2+dlx,y=35,text="LEVEL",colour="ye
 starttime = time.time()
 
 displayclock = LEDscoreobj(canvas1,x=6,y=10,score=7,colour="light green",pixelsize=6, charwidth = 24,numzeros=0, solid = False, bg = False)
-displayclocktext = LEDtextobj(canvas1,x=45,y=25,text="SECONDS",colour="light green",pixelsize = 3, charwidth=18)
+displayclocktext = LEDtextobj(canvas1,x=45,y=25,text="SECONDS",colour="light green",pixelsize = 3, charwidth=20)
 
 alphabet = LEDtextobj(canvas1,x=10,y=540,text="ABCDEFGHIJKLMNOPQRSTUVWXYZ",colour="light green",pixelsize = 4, charwidth=30)
 
@@ -329,6 +327,25 @@ LEDlib.pixelline(canvas1,x=0,y=MAXy-70,dx=1,dy=0,n= 200, colour= "light green", 
 
 progressbar = LEDbarobj(canvas1,x=340,y=27,dx=0,dy=-1,n=6,pixelsize=4,score = 00,max=5000)
 
+line1 = "COLLECT POINTS FOR 7 SECONDS"
+line1text = LEDtextobj(canvas1,x=4,y=100,text=line1,colour="light green",pixelsize = 4, charwidth=28)
+
+line2 = "KEYS 1 2 3 4 5 6 7 8 9 START LEVEL"
+line2text = LEDtextobj(canvas1,x=50,y=400,text=line2,colour="light green",pixelsize = 3, charwidth=21)
+
+line3 = "ARROW KEYS OR WASD CONTROLS CAR"
+line3text = LEDtextobj(canvas1,x=80,y=450,text=line3,colour="light green",pixelsize = 3, charwidth=21)
+
+
+def displaytitle():
+    line1text.draw()
+    line2text.draw()
+    line3text.draw()
+
+def undrawtitle():
+    line1text.undraw()
+    line2text.undraw()
+    line3text.undraw()
 
 def makewalls():
     for x,y in walls:
@@ -486,6 +503,9 @@ def mykey(event):
     global HitWall, PlayerAlive, starttime,score, highscore,walls,pointsset, LEVELSTART, counttime
     key = event.keysym
     if key in ["0","1","2","3","4"]:
+        undrawtitle()
+        if key == "0":
+            displaytitle()
         PlayerAlive = False
         myship.rotate(90)
         myship.dy = 0
