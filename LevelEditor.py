@@ -28,7 +28,7 @@ cherrytype = 6
 orangetype = 7
  # put blocks in grid from (0,0) to (22,12)
 
-MAXx = 1000
+MAXx = 800
 MAXy = 400
 
 class LEDobj:
@@ -165,8 +165,8 @@ def CopyWallData():
     mainwin.clipboard_clear()
     mainwin.clipboard_append(selected_text)
 
-btnCopyWallData = Button(mainwin,text="Copy wall data", command = CopyWallData)
-btnCopyWallData.place(x=20,y=500)
+btnCopyWallData = Button(mainwin,text="Copy wall data (output)", command = CopyWallData)
+btnCopyWallData.place(x=10,y=500)
 
 def CopyFruitData():
     print("Copied fruit data to clipboard")
@@ -183,13 +183,13 @@ def CopyFruitData():
     mainwin.clipboard_clear()
     mainwin.clipboard_append(selected_text)
 
-btnCopyFruitData = Button(mainwin,text="Copy fruit data", command = CopyFruitData)
+btnCopyFruitData = Button(mainwin,text="Copy fruit data (output)", command = CopyFruitData)
 btnCopyFruitData.place(x=180,y=500)
 
 textOutput = Text(mainwin,width=50,height=6,bg="black",fg="orange")
 textOutput.place(x=10,y=410)
 
-textInput = Text(mainwin,width=50,height=6,bg="black",fg="orange")
+textInput = Text(mainwin,width=73,height=6,bg="black",fg="orange")
 textInput.place(x=350,y=410)
 textInput.insert(INSERT,"Paste Text Data Here")
 
@@ -236,10 +236,10 @@ def ReadWallData():
           count = count + 1
           print("reading ...", count)
 
-btnReadFruitData = Button(mainwin,text="Read fruit data", command = ReadFruitData)
-btnReadFruitData.place(x=520,y=500)
+btnReadFruitData = Button(mainwin,text="Input fruit data", command = ReadFruitData)
+btnReadFruitData.place(x=620,y=500)
 
-btnReadWallData = Button(mainwin,text="Read wall data", command = ReadWallData)
+btnReadWallData = Button(mainwin,text="Input wall data from above text box", command = ReadWallData)
 btnReadWallData.place(x=360,y=500)
 
 canvas1.bind("<Button-1>", showclick)
